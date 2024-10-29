@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "name": "CategoryTranscluder",
+    "type": "parserhook",
+    "author": "Simon Bowie <ad7588@coventry.ac.uk>",
+    "version": "1.0.0",
+    "url": "",
+    "description": "Transcludes content from each page within a category onto the category page.",
+    "license-name": "MIT",
+    "requires": {
+        "MediaWiki": ">= 1.39",
+	"platform": {
+	    "php": ">=8.0"
+	}
+    },
+    "AutoloadClasses": {
+        "CategoryTranscluder": "CategoryTranscluder.php"
+    },
+    "Hooks": {
+        "CategoryPageView": "CategoryTranscluder::onCategoryPageView"
+    }
+}
+

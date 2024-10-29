@@ -19,8 +19,14 @@ class CategoryTranscluder {
             __METHOD__
         );
 
-        // Loop through each page and transclude its content
+        // Get an instance of the parser and parser options
+        $parser = MediaWikiServices::getInstance()->getParser();
+        $user = $categoryPage->getContext()->getUser();
+        $parserOptions = new ParserOptions( $user );
+
         $transcludedContent = '';
+
+        // Loop through each page and transclude its content
         foreach ( $pageIds as $pageId ) {
             $title = Title::newFromID( $pageId->cl_from );
             if ( $title && $title->exists() ) {
@@ -32,9 +38,13 @@ class CategoryTranscluder {
                     $content = $revisionRecord->getContent( 'main' );
                     $wikitext = ContentHandler::getContentText( $content );
 
-                    // Parse the wikitext into HTML
-                    $parsedContent = $output->parseAsContent( $wikitext );
-                    
+                    // Parse the wikitext into HTML with Parser::parse()
+                    $parsedContent = $parser->parse(
+                        $wikitext,
+                        $categoryPage->getContext()->getTitle(),
+                        $parserOptions
+                    )->getText();
+
                     // Add parsed content with a header for each page
                     $transcludedContent .= "<h1>" . htmlspecialchars( $title->getText() ) . "</h1>";
                     $transcludedContent .= $parsedContent;
@@ -48,4 +58,5 @@ class CategoryTranscluder {
         return true;
     }
 }
+
 ?>

@@ -4,7 +4,7 @@
     "type": "parserhook",
     "author": "Simon Bowie <ad7588@coventry.ac.uk>",
     "version": "1.0.0",
-    "url": "",
+    "url": "https://github.com/SimonXIX/CategoryTranscluder",
     "description": "Transcludes content from each page within a category onto the category page.",
     "license-name": "MIT",
     "requires": {

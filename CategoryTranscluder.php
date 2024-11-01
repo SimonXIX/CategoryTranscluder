@@ -34,12 +34,17 @@ class CategoryTranscluder {
                     // Parse the wikitext to HTML using the parser with deferred processing
                     $parserOptions = ParserOptions::newFromContext( $output->getContext() );
                     $parserOutput = $parser->parse( $wikitext, $title, $parserOptions );
+
+                    // Collect the parsed content
+                    $transcludedContent .= "<h1>" . htmlspecialchars( $title->getText() ) . "</h1>";
+                    $transcludedContent .= $parserOutput->getText();
                 }
             }
         }
 
         // Add the transcluded content to be processed by ParserOutputPostCache
         $output->addParserOutputContent( $parserOutput );
+        $output->addHTML( '<div class="category-transclusions">' . $transcludedContent . '</div>' );
 
         return true;
     }

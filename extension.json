@@ -1,23 +1,25 @@
 {
     "manifest_version": 2,
-    "name": "CategoryTranscluder",
+    "name": "ExoticTransclusions",
     "type": "parserhook",
     "author": "Simon Bowie <ad7588@coventry.ac.uk>",
     "version": "1.0.0",
     "url": "https://github.com/SimonXIX/CategoryTranscluder",
-    "description": "Transcludes content from each page within a category onto the category page.",
+    "description": "Performs a couple of exotic transclusions: transcludes content from each page within a category onto the category page and allows transclusion of external webpage content via a custom tag.",
     "license-name": "MIT",
     "requires": {
         "MediaWiki": ">= 1.39",
-	"platform": {
-	    "php": ">=8.0"
-	}
+        "platform": {
+            "php": ">=8.0"
+        }
     },
     "AutoloadClasses": {
-        "CategoryTranscluder": "CategoryTranscluder.php"
+        "CategoryTranscluder": "CategoryTranscluder.php",
+        "TranscludeWeb": "TranscludeWeb.php"
     },
     "Hooks": {
-        "CategoryPageView": "CategoryTranscluder::onCategoryPageView"
+        "CategoryPageView": "CategoryTranscluder::onCategoryPageView",
+        "ParserFirstCallInit": "TranscludeWeb::onParserFirstCallInit"
     }
 }
 

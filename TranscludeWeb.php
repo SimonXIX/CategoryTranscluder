@@ -12,10 +12,11 @@ class TranscludeWeb {
         }
 
         $url = $args['url'];
-        $content = self::fetchPlainText($url);
+        $sections = $args['section'] ?? null;
+        $content = self::fetchSections($url, $sections);
 
         if ($content === false) {
-            return '<span class="error">Error: Unable to fetch content from the URL.</span>';
+            return '<span class="error">Error: Unable to fetch content from the URL or specified sections not found.</span>';
         }
 
         // Escape the output to ensure no HTML tags are included
@@ -25,13 +26,7 @@ class TranscludeWeb {
         return $parser->recursiveTagParse($output, $frame);
     }
 
-    /**
-     * Fetches plain text content from a webpage.
-     *
-     * @param string $url
-     * @return string|false The plain text content, or false on failure.
-     */
-    private static function fetchPlainText(string $url) {
+    private static function fetchSections(string $url, ?string $sections): string|false {
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -49,30 +44,47 @@ class TranscludeWeb {
             return false;
         }
 
-        // Strip all HTML tags to get plain text
-        $plainText = self::extractTextFromHTML($html);
-
-        return $plainText;
+        // Parse HTML and extract the specified sections
+        return self::extractSectionsFromHTML($html, $sections);
     }
 
-    /**
-     * Strips HTML tags and returns clean plain text.
-     *
-     * @param string $html
-     * @return string Plain text content.
-     */
+    private static function extractSectionsFromHTML(string $html, ?string $sections): string {
+        $dom = new DOMDocument();
+        @$dom->loadHTML($html); // Suppress warnings for invalid HTML
+
+        if (!$sections) {
+            // No sections specified, return plain text of the entire page
+            return self::extractTextFromHTML($html);
+        }
+
+        $xpath = new DOMXPath($dom);
+        $selectors = array_map('trim', explode(',', $sections)); // Split by commas and trim whitespace
+        $combinedContent = '';
+
+        foreach ($selectors as $selector) {
+            $nodeList = $xpath->query($selector);
+            if ($nodeList->length > 0) {
+                foreach ($nodeList as $node) {
+                    $combinedContent .= $dom->saveHTML($node);
+                }
+            }
+        }
+
+        if (empty($combinedContent)) {
+            // No matching sections found
+            return false;
+        }
+
+        // Extract plain text from the combined HTML content
+        return self::extractTextFromHTML($combinedContent);
+    }
+
     private static function extractTextFromHTML(string $html): string {
-        // Remove script, style, and other non-visible content
         $html = preg_replace('/<script.*?>.*?<\/script>/is', '', $html);
         $html = preg_replace('/<style.*?>.*?<\/style>/is', '', $html);
         $html = preg_replace('/<!--.*?-->/s', '', $html);
-
-        // Strip remaining HTML tags
         $plainText = strip_tags($html);
-
-        // Replace multiple spaces and newlines with a single space
         $plainText = preg_replace('/\s+/', ' ', $plainText);
-
         return trim($plainText);
     }
 }

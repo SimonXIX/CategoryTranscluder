@@ -83,7 +83,7 @@ class TranscludeWeb {
         $html = preg_replace('/<!--.*?-->/s', '', $html);
     
         // Allow paragraph tags but remove other tags
-        $allowedHtml = strip_tags($html, '<p>');
+        $allowedHtml = strip_tags($html, '<p><blockquote><hr>');
     
         // Collapse excessive whitespace and trim
         $allowedHtml = preg_replace('/\s+/', ' ', $allowedHtml);

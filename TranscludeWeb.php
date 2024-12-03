@@ -10,21 +10,18 @@ class TranscludeWeb {
         if (empty($args['url'])) {
             return '<span class="error">Error: The "url" attribute is required.</span>';
         }
-
+    
         $url = $args['url'];
         $sections = $args['section'] ?? null;
         $content = self::fetchSections($url, $sections);
-
+    
         if ($content === false) {
             return '<span class="error">Error: Unable to fetch content from the URL or specified sections not found.</span>';
         }
-
-        // Escape the output to ensure no HTML tags are included
-        $output = htmlspecialchars($content);
-
-        // Optionally parse the escaped text through MediaWiki's parser
-        return $parser->recursiveTagParse($output, $frame);
-    }
+    
+        // Parse the sanitized content through MediaWiki's parser
+        return $parser->recursiveTagParse($content, $frame);
+    }    
 
     private static function fetchSections(string $url, ?string $sections): string|false {
         $ch = curl_init();
@@ -80,13 +77,21 @@ class TranscludeWeb {
     }
 
     private static function extractTextFromHTML(string $html): string {
+        // Remove scripts, styles, and comments
         $html = preg_replace('/<script.*?>.*?<\/script>/is', '', $html);
         $html = preg_replace('/<style.*?>.*?<\/style>/is', '', $html);
         $html = preg_replace('/<!--.*?-->/s', '', $html);
-        $plainText = strip_tags($html);
-        $plainText = preg_replace('/\s+/', ' ', $plainText);
-        return trim($plainText);
+    
+        // Allow paragraph tags but remove other tags
+        $allowedHtml = strip_tags($html, '<p>');
+    
+        // Collapse excessive whitespace and trim
+        $allowedHtml = preg_replace('/\s+/', ' ', $allowedHtml);
+    
+        return trim($allowedHtml);
     }
+    
 }
+
 
 ?>

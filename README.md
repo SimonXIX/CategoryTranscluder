@@ -31,6 +31,18 @@ The CategoryTranscluder function is automatically applied to all category pages.
 To transclude text from an external webpage, use the custom tag:
 
 ```
+<transclude url="[URL]"></transclude>
+```
+
+or with the optional `section` parameter:
+
+```
+<transclude url="[URL]" section="//[SECTION]"></transclude>
+```
+
+For example:
+
+```
 <transclude url="https://constantvzw.org/wefts/unboundlibraries-eva.en.html" section="//section[@id='sameness-and-difference'],//section[@id='structural-hierarchies']"></transclude>
 ```
 
